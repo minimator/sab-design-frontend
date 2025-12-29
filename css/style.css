@@ -1,0 +1,144 @@
+/* ---------- base ---------- */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  font-family:'Poppins',sans-serif;
+  background:#fff;color:#111;line-height:1.6;
+}
+.container{width:92%;max-width:1150px;margin:0 auto}
+
+/* ---------- colors ---------- */
+:root{
+  --coffee:#6f4e37;   /* coffee brown */
+  --accent:#caa77d;   /* warm accent */
+  --black:#111;
+  --muted:#666;
+}
+
+/* ---------- header social (center) ---------- */
+.header-social {
+    display: flex;
+    gap: 18px;
+}
+
+.header-social a {
+    font-size: 18px;
+    color: var(--black);
+    transition: 0.3s ease-in-out;
+    text-decoration: none;
+}
+
+.header-social a:hover {
+    color: #c59f60; /* Coffee brown hover */
+}
+
+
+/* ---------- header ---------- */
+.site-nav-wrap{position:sticky;top:0;z-index:1100;background:transparent;padding:12px 0}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand-link{display:flex;align-items:center}
+.logo-img{height:64px;width:auto}
+
+/* main nav */
+.main-nav{display:flex;gap:18px;align-items:center}
+.main-nav .nav-link{color:var(--black);text-decoration:none;font-weight:600;padding:8px 10px;border-radius:6px}
+.main-nav .nav-link.active,.main-nav .nav-link:hover{background:var(--black);color:#fff}
+
+/* mobile toggle */
+.nav-toggle{display:none;background:#fff;border:0;padding:8px;border-radius:6px;box-shadow:0 6px 14px rgba(0,0,0,.06)}
+
+/* ---------- hero ---------- */
+.hero-hero{height:76vh;background-size:cover;background-position:center;display:flex;align-items:center;position:relative;margin-top:8px}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(255,255,255,0.06),rgba(0,0,0,0.12));}
+.hero-content{position:relative;z-index:2;color:#111;padding:60px 0}
+.hero-title{font-size:44px;color:var(--black);margin:0 0 10px;font-weight:700}
+.hero-sub{margin:0 0 18px;color:var(--muted)}
+.btn{display:inline-block;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:600}
+.btn-primary{background:var(--coffee);color:#fff;border:0}
+.btn-outline{background:#fff;border:1px solid #ddd;color:var(--black)}
+
+/* section */
+.section{padding:60px 0}
+.section-white{background:#fff}
+.section-heading{text-align:center;font-size:28px;margin-bottom:24px;color:var(--black)}
+
+/* services grid */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.service-card{background:#fff;border-radius:10px;padding:0;box-shadow:0 8px 28px rgba(20,20,20,.06);overflow:hidden}
+.service-card img{width:100%;height:200px;object-fit:cover}
+.service-card h3{margin:14px;color:var(--coffee)}
+.service-card p{padding:0 14px 18px;color:var(--muted)}
+
+/* projects row */
+.projects-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.project-card{display:block;width:300px;border-radius:10px;overflow:hidden;text-decoration:none;color:#fff;position:relative;box-shadow:0 8px 20px rgba(0,0,0,.06)}
+.project-card img{width:100%;height:200px;object-fit:cover;display:block}
+.project-caption{position:absolute;bottom:10px;left:12px;color:#fff;font-weight:700}
+
+/* about two-col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
+.about-text h2{color:var(--black)}
+.about-text p{color:var(--muted)}
+.about-image img{width:100%;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+
+/* checklist */
+.checklist{padding-left:18px}
+.checklist li{margin-bottom:8px;color:var(--muted)}
+
+/* leadership team */
+.leadership .heading-row{display:flex;align-items:baseline;gap:18px;margin-bottom:22px}
+.leadership .muted{font-weight:600;color:#111}
+.leadership .lead-title{font-size:32px;margin:0}
+.leadership .lead-title .coffee{color:var(--coffee);font-weight:700}
+
+/* team grid */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.team-card{position:relative;overflow:hidden;border-radius:8px}
+.team-photo img{width:100%;height:320px;object-fit:cover;display:block;transition:transform .5s ease}
+.team-overlay{position:absolute;inset:0;background:rgba(255,255,255,0);display:flex;align-items:flex-end;justify-content:center;transition:background .3s ease}
+.team-meta{padding:18px;text-align:center;transform:translateY(30%);opacity:0;transition:all .3s ease;color:var(--black)}
+.team-meta h4{margin:0 0 6px}
+.team-meta p{margin:0 0 8px;color:var(--muted)}
+.team-socials a{margin:0 6px;color:var(--black)}
+.team-card:hover .team-photo img{transform:scale(1.04)}
+.team-card:hover .team-overlay{background:rgba(210,210,210,0.45)}
+.team-card:hover .team-meta{transform:translateY(0);opacity:1}
+
+/* services list */
+.service-detail{display:flex;gap:18px;align-items:center;margin-bottom:24px}
+.service-detail img{width:320px;height:200px;object-fit:cover;border-radius:8px}
+.service-detail-body h3{color:var(--coffee)}
+
+/* why choose */
+.why-choose{display:flex;gap:24px;align-items:center;margin-top:36px}
+.why-image img{width:100%;border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+.why-text h3{color:var(--black)}
+
+/* contact */
+.contact-hero .contact-main{font-size:36px;line-height:1.05;margin-bottom:20px}
+.contact-main .black{color:var(--black);font-weight:700}
+.contact-main .coffee{color:var(--coffee);font-weight:700}
+.contact-grid{display:grid;grid-template-columns:1fr 460px;gap:36px;align-items:start}
+.contact-info-block h4{margin-bottom:6px;color:var(--black)}
+.contact-info-block p{margin-top:0;color:var(--muted)}
+.contact-form input,.contact-form textarea{width:100%;padding:12px;border:1px solid #e6e6e6;border-radius:6px;margin-bottom:12px}
+
+/* footer */
+.site-footer{background:#f8f8f8;padding:18px 0;margin-top:40px}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}
+.footer-inner a{color:var(--muted);margin-left:10px;text-decoration:none}
+
+/* responsive */
+@media (max-width:900px){
+  .two-col{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .nav-toggle{display:block}
+  .main-nav{display:none;position:absolute;right:14px;top:86px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.08);flex-direction:column}
+  .main-nav.open{display:flex}
+  .logo-img{height:56px}
+}
+@media (max-width:480px){
+  .hero-title{font-size:28px}
+  .contact-main{font-size:28px}
+  .team-photo img{height:220px}
+}
