@@ -1,30 +1,31 @@
-// ============ PASSWORD VISIBILITY TOGGLE ============
-const passwordToggle = document.getElementById("passwordToggle");
-const passwordInput = document.getElementById("password");
+const API_URL = "https://YOUR-BACKEND.onrender.com"; // replace with your backend URL
 
-if (passwordToggle && passwordInput) {
-  passwordToggle.addEventListener("click", (e) => {
-    e.preventDefault();
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
-    
-    // Toggle icon
-    const icon = passwordToggle.querySelector("i");
-    icon.classList.toggle("fa-eye");
-    icon.classList.toggle("fa-eye-slash");
-  });
+const loginSection = document.getElementById("login-section");
+const dashboardSection = document.getElementById("dashboard-section");
+const errorEl = document.getElementById("loginError");
+
+// Check if admin is already logged in
+function checkLogin() {
+  const token = localStorage.getItem("token");
+  if (token) {
+    loginSection.style.display = "none";
+    dashboardSection.style.display = "block";
+    loadMessages(); // load messages automatically
+  } else {
+    loginSection.style.display = "block";
+    dashboardSection.style.display = "none";
+  }
 }
 
-// ============ LOGIN FORM SUBMISSION ============
+// Call checkLogin on page load
+checkLogin();
+
+// Handle login form submission
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const loginError = document.getElementById("loginError");
-
-  // Clear previous errors
-  loginError.textContent = "";
 
   try {
     const res = await fetch(`${API_URL}/api/auth/login`, {
@@ -35,14 +36,64 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
     const data = await res.json();
 
-    if (data.token) {
+    if (res.ok && data.token) {
       localStorage.setItem("token", data.token);
-      window.location.href = "dashboard.html";
+      loginSection.style.display = "none";
+      dashboardSection.style.display = "block";
+      errorEl.innerText = "";
+
+      loadMessages(); // automatically load messages after login
     } else {
-      loginError.textContent = data.message || "Login failed. Please check your credentials.";
+      errorEl.innerText = data.message || "Invalid credentials";
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    loginError.textContent = "An error occurred. Please try again later.";
+  } catch (err) {
+    console.error(err);
+    errorEl.innerText = "Server error. Please try again.";
   }
 });
+
+// Load messages from backend
+async function loadMessages() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("You must login first!");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/contact`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+
+    const messages = await res.json();
+    const container = document.getElementById("messages");
+    container.innerHTML = "";
+
+    if (!messages.length) {
+      container.innerHTML = "<p>No messages found.</p>";
+      return;
+    }
+
+    messages.forEach(msg => {
+      const div = document.createElement("div");
+      div.style.border = "1px solid #ccc";
+      div.style.padding = "10px";
+      div.style.marginBottom = "10px";
+      div.innerHTML = `
+        <p><strong>Name:</strong> ${msg.name}</p>
+        <p><strong>Email:</strong> ${msg.email}</p>
+        <p><strong>Message:</strong> ${msg.message}</p>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load messages");
+  }
+}
+
+// Logout function
+function logout() {
+  localStorage.removeItem("token");
+  checkLogin(); // show login form again
+}
