@@ -1,51 +1,34 @@
-// ======== admin.js ========
+const API_URL = window.API_URL || "https://sab-design-backend.onrender.com/api";
 
-// Fallback if API_URL is not defined
-if (typeof API_URL === "undefined") {
-  var API_URL = "http://localhost:5000"; // local fallback
-}
-
-// DOM Elements
+// Elements
 const loginForm = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginError = document.getElementById("loginError");
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
-const togglePassword = document.getElementById("togglePassword");
+const loginError = document.getElementById("loginError");
 
-// ======= Show/Hide Password =======
-if (togglePassword && passwordInput) {
-  togglePassword.addEventListener("click", () => {
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
-    togglePassword.classList.toggle("fa-eye-slash");
-  });
-}
+// =======================
+// AUTO LOGIN CHECK
+// =======================
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("adminToken");
+  if (token) {
+    showDashboard();
+  }
+});
 
-// ======= Check if already logged in =======
-const token = localStorage.getItem("token");
-if (token) {
-  loginSection.style.display = "none";
-  dashboardSection.style.display = "block";
-}
-
-// ======= Login Form Submit =======
+// =======================
+// LOGIN
+// =======================
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     loginError.textContent = "";
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) {
-      loginError.textContent = "Email and password required";
-      return;
-    }
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -54,69 +37,114 @@ if (loginForm) {
       const data = await res.json();
 
       if (!res.ok) {
-        loginError.textContent = data.message || "Login failed. Try again.";
+        loginError.textContent = data.message || "Login failed";
         return;
       }
 
-      // Save token and show dashboard
-      localStorage.setItem("token", data.token);
-      loginSection.style.display = "none";
-      dashboardSection.style.display = "block";
+      localStorage.setItem("adminToken", data.token);
+      showDashboard();
 
-      loadMessages(); // optional, load messages immediately
     } catch (err) {
-      console.error(err);
-      loginError.textContent = "Server error. Try again later.";
+      loginError.textContent = "Server error. Try again.";
     }
   });
 }
 
-// ======= Logout Function =======
-function logoutAdmin() {
-  localStorage.removeItem("token");
-  loginSection.style.display = "block";
-  dashboardSection.style.display = "none";
+// =======================
+// DASHBOARD VISIBILITY
+// =======================
+function showDashboard() {
+  loginSection.style.display = "none";
+  dashboardSection.style.display = "block";
 }
 
-// ======= Load Messages (Example API) =======
-async function loadMessages() {
-  const messagesDiv = document.getElementById("messages");
-  messagesDiv.innerHTML = "Loading...";
+// =======================
+// LOGOUT
+// =======================
+function logout() {
+  localStorage.removeItem("adminToken");
+  location.reload();
+}
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    messagesDiv.innerHTML = "Not authorized";
-    return;
-  }
+// =======================
+// LOAD MESSAGES (SECURED)
+// =======================
+async function loadMessages() {
+  const token = localStorage.getItem("adminToken");
+  if (!token) return logout();
 
   try {
-    const res = await fetch(`${API_URL}/api/contact`, {
-      headers: { "Authorization": "Bearer " + token }
+    const res = await fetch(`${API_URL}/contact`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
-    if (!res.ok) {
-      messagesDiv.innerHTML = "Failed to fetch messages";
-      return;
-    }
+    const data = await res.json();
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = "";
 
-    const messages = await res.json();
+    data.forEach(m => {
+      messagesDiv.innerHTML += `
+        <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px;">
+          <strong>${m.name}</strong> (${m.email})<br/>
+          ${m.message}
+        </div>
+      `;
+    });
 
-    if (!messages.length) {
-      messagesDiv.innerHTML = "No messages yet";
-      return;
-    }
-
-    messagesDiv.innerHTML = messages
-      .map(
-        (m) =>
-          `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-            <strong>${m.name} (${m.email})</strong><br>
-            ${m.message}
-          </div>`
-      )
-      .join("");
   } catch (err) {
-    console.error(err);
-    messagesDiv.innerHTML = "Server error";
+    alert("Failed to load messages");
   }
+}
+
+// =======================
+// PASSWORD TOGGLE
+// =======================
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+if (togglePassword && passwordInput) {
+  togglePassword.addEventListener("click", () => {
+    passwordInput.type =
+      passwordInput.type === "password" ? "text" : "password";
+    togglePassword.classList.toggle("fa-eye-slash");
+  });
+}
+
+const projectForm = document.getElementById("projectForm");
+const projectMsg = document.getElementById("projectMsg");
+
+if (projectForm) {
+  projectForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("adminToken");
+
+    const data = {
+      title: document.getElementById("title").value,
+      image: document.getElementById("image").value,
+      description: document.getElementById("description").value
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/projects`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!res.ok) throw new Error();
+
+      projectMsg.style.color = "green";
+      projectMsg.textContent = "Project added successfully";
+      projectForm.reset();
+    } catch {
+      projectMsg.style.color = "red";
+      projectMsg.textContent = "Failed to upload project";
+    }
+  });
 }

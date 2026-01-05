@@ -16,11 +16,15 @@
   <link rel="stylesheet" href="css/style.css">
 
   <style>
+    /* ===== Admin Page Styles ===== */
     .admin-form { max-width: 400px; margin:auto; }
-    .admin-input { width: 100%; padding:12px 40px 12px 12px; margin-bottom:15px; font-size:15px; }
+    .admin-input { width: 100%; padding:12px 40px 12px 12px; margin-bottom:15px; font-size:15px; box-sizing:border-box; }
     .password-wrapper { position: relative; }
     .toggle-password { position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:#666; }
-    .stat-box { padding:20px; border:1px solid #ddd; min-width:150px; text-align:center; margin-bottom:20px; }
+    .stat-box { padding:20px; border:1px solid #ddd; min-width:150px; text-align:center; margin-bottom:20px; flex:1; }
+    #projectsList div { border:1px solid #ccc; padding:10px; margin-bottom:10px; }
+    textarea.admin-input { height:80px; resize:none; }
+    @media(max-width:600px){ .stat-box { min-width:100%; } }
   </style>
 </head>
 
@@ -70,11 +74,11 @@
 <section class="section section-white" id="dashboard-section" style="display:none;">
   <div class="container">
     <h2 class="section-heading">Admin Dashboard</h2>
-    
+
     <button class="btn btn-secondary" id="logoutBtn" style="margin-bottom:20px;">Logout</button>
 
     <!-- Analytics -->
-    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
       <div class="stat-box">Messages: <strong id="msgCount">0</strong></div>
       <div class="stat-box">Projects: <strong id="projectCount">0</strong></div>
       <div class="stat-box">Admins: <strong id="adminCount">0</strong></div>
@@ -117,6 +121,25 @@
 <script src="js/config.js"></script>
 <script src="js/admin.js"></script>
 <script src="js/script.js"></script>
-<script>AOS.init();</script>
+<script>
+  AOS.init();
+
+  // Toggle nav menu
+  const navToggle = document.getElementById("nav-toggle");
+  const mainNav = document.getElementById("main-nav");
+  if(navToggle && mainNav){
+    navToggle.addEventListener("click",()=>mainNav.classList.toggle("open"));
+  }
+
+  // Logout
+  const logoutBtn = document.getElementById("logoutBtn");
+  if(logoutBtn){
+    logoutBtn.addEventListener("click",()=>{ 
+      localStorage.removeItem("token");
+      document.getElementById("login-section").style.display = "block";
+      document.getElementById("dashboard-section").style.display = "none";
+    });
+  }
+</script>
 </body>
 </html>
