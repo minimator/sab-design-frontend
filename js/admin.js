@@ -1,99 +1,71 @@
-const API_URL = "https://YOUR-BACKEND.onrender.com"; // replace with your backend URL
-
+const loginForm = document.getElementById("loginForm");
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
-const errorEl = document.getElementById("loginError");
+const loginError = document.getElementById("loginError");
 
-// Check if admin is already logged in
-function checkLogin() {
-  const token = localStorage.getItem("token");
-  if (token) {
-    loginSection.style.display = "none";
-    dashboardSection.style.display = "block";
-    loadMessages(); // load messages automatically
-  } else {
-    loginSection.style.display = "block";
-    dashboardSection.style.display = "none";
-  }
-}
+// LOGIN
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault(); // ⛔ stops page refresh
 
-// Call checkLogin on page load
-checkLogin();
-
-// Handle login form submission
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   try {
-    const res = await fetch(`${API_URL}/api/auth/login`, {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
 
-    if (res.ok && data.token) {
-      localStorage.setItem("token", data.token);
-      loginSection.style.display = "none";
-      dashboardSection.style.display = "block";
-      errorEl.innerText = "";
-
-      loadMessages(); // automatically load messages after login
-    } else {
-      errorEl.innerText = data.message || "Invalid credentials";
-    }
-  } catch (err) {
-    console.error(err);
-    errorEl.innerText = "Server error. Please try again.";
-  }
-});
-
-// Load messages from backend
-async function loadMessages() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("You must login first!");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_URL}/api/contact`, {
-      headers: { "Authorization": "Bearer " + token }
-    });
-
-    const messages = await res.json();
-    const container = document.getElementById("messages");
-    container.innerHTML = "";
-
-    if (!messages.length) {
-      container.innerHTML = "<p>No messages found.</p>";
+    if (!res.ok) {
+      loginError.textContent = data.message || "Login failed";
       return;
     }
 
-    messages.forEach(msg => {
-      const div = document.createElement("div");
-      div.style.border = "1px solid #ccc";
-      div.style.padding = "10px";
-      div.style.marginBottom = "10px";
-      div.innerHTML = `
-        <p><strong>Name:</strong> ${msg.name}</p>
-        <p><strong>Email:</strong> ${msg.email}</p>
-        <p><strong>Message:</strong> ${msg.message}</p>
-      `;
-      container.appendChild(div);
-    });
+    localStorage.setItem("adminToken", data.token);
+
+    loginSection.style.display = "none";
+    dashboardSection.style.display = "block";
   } catch (err) {
-    console.error(err);
-    alert("Failed to load messages");
+    loginError.textContent = "Server error";
   }
+});
+
+// SHOW / HIDE PASSWORD
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+togglePassword.addEventListener("click", () => {
+  const type = passwordInput.type === "password" ? "text" : "password";
+  passwordInput.type = type;
+  togglePassword.classList.toggle("fa-eye");
+  togglePassword.classList.toggle("fa-eye-slash");
+});
+
+// LOAD MESSAGES (example)
+async function loadMessages() {
+  const token = localStorage.getItem("adminToken");
+
+  if (!token) {
+    alert("Not authorized");
+    return;
+  }
+
+  const res = await fetch(`${API_BASE_URL}/api/messages`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const messages = await res.json();
+  document.getElementById("messages").innerHTML =
+    "<pre>" + JSON.stringify(messages, null, 2) + "</pre>";
 }
 
-// Logout function
+// LOGOUT
 function logout() {
-  localStorage.removeItem("token");
-  checkLogin(); // show login form again
+  localStorage.removeItem("adminToken");
+  location.reload();
 }
