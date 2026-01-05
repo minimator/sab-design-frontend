@@ -1,123 +1,122 @@
+// ======== admin.js ========
+
+// Fallback if API_URL is not defined
+if (typeof API_URL === "undefined") {
+  var API_URL = "http://localhost:5000"; // local fallback
+}
+
+// DOM Elements
 const loginForm = document.getElementById("loginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
 const loginError = document.getElementById("loginError");
-const dashboardSection = document.getElementById("dashboard-section");
 const loginSection = document.getElementById("login-section");
+const dashboardSection = document.getElementById("dashboard-section");
 const togglePassword = document.getElementById("togglePassword");
 
-const projectForm = document.getElementById("projectForm");
-const projectMsg = document.getElementById("projectMsg");
-const projectsList = document.getElementById("projectsList");
-
-const logoutBtn = document.getElementById("logoutBtn");
-
-// ====== PASSWORD SHOW/HIDE ======
-togglePassword?.addEventListener("click", () => {
-  const passwordInput = document.getElementById("password");
-  const type = passwordInput.type === "password" ? "text" : "password";
-  passwordInput.type = type;
-  togglePassword.classList.toggle("fa-eye-slash");
-});
-
-// ====== LOGIN ======
-loginForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  try {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message || "Login failed");
-
-    localStorage.setItem("adminToken", data.token);
-    loginSection.style.display = "none";
-    dashboardSection.style.display = "block";
-
-    loadStats();
-    loadProjects();
-  } catch (err) {
-    loginError.textContent = err.message;
-  }
-});
-
-// ====== LOGOUT ======
-logoutBtn?.addEventListener("click", () => {
-  localStorage.removeItem("adminToken");
-  dashboardSection.style.display = "none";
-  loginSection.style.display = "block";
-});
-
-// ====== DASHBOARD STATS ======
-async function loadStats() {
-  try {
-    const token = localStorage.getItem("adminToken");
-    const res = await fetch(`${API_URL}/admin/stats`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    document.getElementById("msgCount").textContent = data.messages;
-    document.getElementById("projectCount").textContent = data.projects;
-    document.getElementById("adminCount").textContent = data.admins;
-  } catch {
-    console.error("Failed to load stats");
-  }
+// ======= Show/Hide Password =======
+if (togglePassword && passwordInput) {
+  togglePassword.addEventListener("click", () => {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+    togglePassword.classList.toggle("fa-eye-slash");
+  });
 }
 
-// ====== UPLOAD PROJECT ======
-projectForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("adminToken");
-  const data = {
-    title: document.getElementById("title").value,
-    image: document.getElementById("image").value,
-    description: document.getElementById("description").value
-  };
-
-  try {
-    const res = await fetch(`${API_URL}/projects`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data)
-    });
-
-    if (!res.ok) throw new Error();
-    projectMsg.style.color = "green";
-    projectMsg.textContent = "Project added successfully";
-    projectForm.reset();
-    loadProjects();
-  } catch {
-    projectMsg.style.color = "red";
-    projectMsg.textContent = "Failed to upload project";
-  }
-});
-
-// ====== LOAD PROJECTS ======
-async function loadProjects() {
-  try {
-    const res = await fetch(`${API_URL}/projects`);
-    const projects = await res.json();
-    projectsList.innerHTML = projects.map(p => `
-      <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px;">
-        <strong>${p.title}</strong><br />
-        <img src="${p.image}" alt="${p.title}" style="width:100px; margin-top:5px;" /><br />
-        <p>${p.description}</p>
-      </div>
-    `).join("");
-  } catch {
-    projectsList.innerHTML = "<p>Failed to load projects</p>";
-  }
-}
-
-// ====== AUTO LOGIN ======
-if (localStorage.getItem("adminToken")) {
+// ======= Check if already logged in =======
+const token = localStorage.getItem("token");
+if (token) {
   loginSection.style.display = "none";
   dashboardSection.style.display = "block";
-  loadStats();
-  loadProjects();
+}
+
+// ======= Login Form Submit =======
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    loginError.textContent = "";
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      loginError.textContent = "Email and password required";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        loginError.textContent = data.message || "Login failed. Try again.";
+        return;
+      }
+
+      // Save token and show dashboard
+      localStorage.setItem("token", data.token);
+      loginSection.style.display = "none";
+      dashboardSection.style.display = "block";
+
+      loadMessages(); // optional, load messages immediately
+    } catch (err) {
+      console.error(err);
+      loginError.textContent = "Server error. Try again later.";
+    }
+  });
+}
+
+// ======= Logout Function =======
+function logoutAdmin() {
+  localStorage.removeItem("token");
+  loginSection.style.display = "block";
+  dashboardSection.style.display = "none";
+}
+
+// ======= Load Messages (Example API) =======
+async function loadMessages() {
+  const messagesDiv = document.getElementById("messages");
+  messagesDiv.innerHTML = "Loading...";
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    messagesDiv.innerHTML = "Not authorized";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/contact`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+
+    if (!res.ok) {
+      messagesDiv.innerHTML = "Failed to fetch messages";
+      return;
+    }
+
+    const messages = await res.json();
+
+    if (!messages.length) {
+      messagesDiv.innerHTML = "No messages yet";
+      return;
+    }
+
+    messagesDiv.innerHTML = messages
+      .map(
+        (m) =>
+          `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <strong>${m.name} (${m.email})</strong><br>
+            ${m.message}
+          </div>`
+      )
+      .join("");
+  } catch (err) {
+    console.error(err);
+    messagesDiv.innerHTML = "Server error";
+  }
 }
