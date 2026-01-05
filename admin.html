@@ -5,32 +5,184 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard – SAB EXTERIOR & INTERIOR NEPAL</title>
 
-  <!-- Fonts & icons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-  <!-- AOS -->
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"/>
 
-  <!-- Main CSS -->
   <link rel="stylesheet" href="css/style.css">
 
   <style>
-    /* ===== Admin Page Styles ===== */
-    .admin-form { max-width: 400px; margin:auto; }
-    .admin-input { width: 100%; padding:12px 40px 12px 12px; margin-bottom:15px; font-size:15px; box-sizing:border-box; }
-    .password-wrapper { position: relative; }
-    .toggle-password { position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:#666; }
-    .stat-box { padding:20px; border:1px solid #ddd; min-width:150px; text-align:center; margin-bottom:20px; flex:1; }
-    #projectsList div { border:1px solid #ccc; padding:10px; margin-bottom:10px; }
-    textarea.admin-input { height:80px; resize:none; }
-    @media(max-width:600px){ .stat-box { min-width:100%; } }
+    /* 🎨 MODERN ADMIN PAGE STYLES */
+    
+    :root {
+      --primary-color: #007bff; /* A clean blue */
+      --secondary-bg: #f5f7fa; /* Light background for sections */
+      --border-color: #e0e0e0;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 8px;
+    }
+
+    /* General containers and section padding */
+    .section-white {
+        background-color: #fff;
+        padding: 60px 0; /* Increase section padding */
+    }
+    .section-heading {
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    /* Form Styling */
+    .admin-form { 
+        max-width: 450px; /* Slightly wider form */
+        margin: auto; 
+        padding: 30px;
+        background-color: var(--secondary-bg);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+    }
+
+    /* Input Styling */
+    .admin-input { 
+        width: 100%; 
+        padding: 14px 18px; /* Bigger padding */
+        margin-bottom: 20px; 
+        font-size: 16px; 
+        box-sizing: border-box; 
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        transition: border-color 0.3s, box-shadow 0.3s;
+        background-color: #fff;
+    }
+    .admin-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        outline: none;
+    }
+    
+    /* Password Toggle */
+    .password-wrapper { 
+        position: relative; 
+    }
+    .toggle-password { 
+        position:absolute; 
+        right:15px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        cursor:pointer; 
+        color:#999; 
+        font-size: 18px;
+        padding: 5px;
+    }
+
+    /* Button Enhancements */
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 14px 25px;
+        font-weight: 600;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+    .btn-primary:active {
+        transform: scale(0.99);
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-weight: 500;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Dashboard Analytics Boxes */
+    .stat-box-container {
+        display:flex; 
+        gap:20px; 
+        flex-wrap:wrap; 
+        margin-bottom:30px;
+        justify-content: space-between;
+    }
+    .stat-box { 
+        padding: 25px; 
+        border: 1px solid var(--border-color); 
+        min-width: 180px;
+        text-align:center; 
+        flex:1; 
+        background-color: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        line-height: 1.5;
+        font-size: 16px;
+    }
+    .stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    .stat-box strong {
+        display: block;
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-top: 5px;
+    }
+
+    /* Project List */
+    #projectsList div { 
+        border: 1px solid #ddd; 
+        padding: 15px; /* More padding */
+        margin-bottom: 15px; 
+        border-left: 5px solid var(--primary-color);
+        background-color: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+    }
+    #projectsList div:hover {
+        background-color: var(--secondary-bg);
+    }
+
+    /* Textarea adjustment */
+    textarea.admin-input { 
+        height: 100px; /* Taller textarea */
+        resize: vertical; 
+    }
+    
+    /* Responsive adjustment for stats */
+    @media(max-width:768px){ 
+        .stat-box { 
+            min-width: 45%; /* Two boxes per row */
+        }
+        .admin-form {
+            padding: 20px;
+        }
+    }
+    @media(max-width:480px){ 
+        .stat-box { 
+            min-width: 100%; 
+        }
+    }
   </style>
 </head>
 
 <body>
 
-<!-- Header -->
 <header class="site-nav-wrap">
   <div class="container header-row">
     <div class="brand">
@@ -49,62 +201,61 @@
   </div>
 </header>
 
-<!-- Login Section -->
 <section class="section section-white" data-aos="fade-up" id="login-section">
   <div class="container">
-    <h2 class="section-heading">Admin Login</h2>
-    <p>Please login to access the dashboard.</p>
+    <h2 class="section-heading">🔑 Admin Login</h2> 
+    <p style="text-align:center; margin-bottom: 30px; color:#666;">Please login to access the dashboard securely.</p>
 
     <form id="loginForm" class="admin-form">
-      <input type="email" id="email" class="admin-input" placeholder="Email" required />
+      <input type="email" id="email" class="admin-input" placeholder="Email Address" required />
 
       <div class="password-wrapper">
-        <input type="password" id="password" class="admin-input" placeholder="Password" required />
+        <input type="password" id="password" class="admin-input" placeholder="Password" required style="padding-right: 40px;" />
         <i class="fa fa-eye toggle-password" id="togglePassword"></i>
       </div>
 
-      <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Log In</button>
     </form>
 
-    <p id="loginError" style="color:red; margin-top:10px;"></p>
+    <p id="loginError" style="color:red; margin-top:15px; text-align:center;"></p>
   </div>
 </section>
 
-<!-- Dashboard -->
 <section class="section section-white" id="dashboard-section" style="display:none;">
   <div class="container">
-    <h2 class="section-heading">Admin Dashboard</h2>
+    <h2 class="section-heading">📊 Admin Dashboard</h2>
 
-    <button class="btn btn-secondary" id="logoutBtn" style="margin-bottom:20px;">Logout</button>
-
-    <!-- Analytics -->
-    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
-      <div class="stat-box">Messages: <strong id="msgCount">0</strong></div>
-      <div class="stat-box">Projects: <strong id="projectCount">0</strong></div>
-      <div class="stat-box">Admins: <strong id="adminCount">0</strong></div>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
     </div>
 
-    <hr style="margin:20px 0;" />
+    <h3>Statistics Overview</h3>
+    <div class="stat-box-container">
+      <div class="stat-box">Messages Received 💬<strong id="msgCount">0</strong></div>
+      <div class="stat-box">Total Projects 🏗️<strong id="projectCount">0</strong></div>
+      <div class="stat-box">Active Admins 👤<strong id="adminCount">0</strong></div>
+    </div>
 
-    <!-- Project Upload -->
-    <h3>Add New Project</h3>
+    <hr style="margin:40px 0; border-color: #eee;" />
+
+    <h3>➕ Add New Project</h3>
     <form id="projectForm" class="admin-form">
       <input class="admin-input" id="title" placeholder="Project Title" required />
-      <input class="admin-input" id="image" placeholder="Image URL" required />
-      <textarea class="admin-input" id="description" placeholder="Description" required></textarea>
+      <input class="admin-input" id="image" placeholder="Image URL (e.g., https://.../image.jpg)" required />
+      <textarea class="admin-input" id="description" placeholder="Brief Description of the Project" required></textarea>
 
       <button class="btn btn-primary" type="submit" style="width:100%;">Upload Project</button>
     </form>
 
-    <p id="projectMsg" style="margin-top:10px;"></p>
+    <p id="projectMsg" style="margin-top:15px; text-align:center;"></p>
 
-    <!-- Projects -->
-    <h3 style="margin-top:40px;">All Projects</h3>
-    <div id="projectsList" style="margin-top:15px;"></div>
+    <h3 style="margin-top:40px;">📋 All Projects</h3>
+    <div id="projectsList" style="margin-top:20px;">
+        <p style="color:#999;">Projects will be loaded here...</p>
+    </div>
   </div>
 </section>
 
-<!-- Footer -->
 <footer class="site-footer">
   <div class="container footer-inner">
     <div class="footer-left">© 2026 SAB Exterior & Interior Nepal</div>
@@ -116,7 +267,6 @@
   </div>
 </footer>
 
-<!-- Scripts -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="js/config.js"></script>
 <script src="js/admin.js"></script>
