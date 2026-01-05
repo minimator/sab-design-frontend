@@ -1,56 +1,53 @@
+// frontend/js/admin.js
+
 const loginForm = document.getElementById("loginForm");
-const loginError = document.getElementById("loginError");
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
-const passwordInput = document.getElementById("password");
+const loginError = document.getElementById("loginError");
 
-// Show/hide password
-const togglePassword = document.createElement("input");
-togglePassword.type = "checkbox";
-togglePassword.id = "togglePassword";
-togglePassword.style.marginLeft = "10px";
-loginForm.appendChild(togglePassword);
-const label = document.createElement("label");
-label.innerText = "Show";
-label.htmlFor = "togglePassword";
-loginForm.appendChild(label);
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-togglePassword.addEventListener("change", () => {
-  passwordInput.type = togglePassword.checked ? "text" : "password";
-});
+    loginError.textContent = "";
 
-// Login
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = passwordInput.value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      loginError.textContent = data.message || "Login failed";
-      return;
+      if (!res.ok) {
+        loginError.textContent = data.message || "Login failed";
+        return;
+      }
+
+      localStorage.setItem("adminToken", data.token);
+
+      loginSection.style.display = "none";
+      dashboardSection.style.display = "block";
+
+    } catch (err) {
+      loginError.textContent = "Server error. Try again.";
+      console.error(err);
     }
+  });
+}
 
-    localStorage.setItem("adminToken", data.token);
-    loginSection.style.display = "none";
-    dashboardSection.style.display = "block";
-  } catch (err) {
-    console.error(err);
-    loginError.textContent = "Cannot reach server";
-  }
-});
-
-// Logout function
+// Logout
 function logout() {
   localStorage.removeItem("adminToken");
-  dashboardSection.style.display = "none";
-  loginSection.style.display = "block";
+  location.reload();
+}
+
+// Auto login if token exists
+if (localStorage.getItem("adminToken")) {
+  loginSection.style.display = "none";
+  dashboardSection.style.display = "block";
 }
