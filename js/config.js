@@ -1,1 +1,2 @@
-const API_BASE_URL = "https://sab-design-backend.onrender.com";
+// js/config.js
+const API_URL = "https://sab-design-backend.onrender.com";
