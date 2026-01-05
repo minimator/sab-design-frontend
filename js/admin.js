@@ -2,21 +2,26 @@ const loginForm = document.getElementById("loginForm");
 const loginError = document.getElementById("loginError");
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
-const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
 
-/* SHOW / HIDE PASSWORD */
-togglePassword.addEventListener("click", () => {
-  const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-  passwordInput.setAttribute("type", type);
-  togglePassword.classList.toggle("fa-eye");
-  togglePassword.classList.toggle("fa-eye-slash");
+// Show/hide password
+const togglePassword = document.createElement("input");
+togglePassword.type = "checkbox";
+togglePassword.id = "togglePassword";
+togglePassword.style.marginLeft = "10px";
+loginForm.appendChild(togglePassword);
+const label = document.createElement("label");
+label.innerText = "Show";
+label.htmlFor = "togglePassword";
+loginForm.appendChild(label);
+
+togglePassword.addEventListener("change", () => {
+  passwordInput.type = togglePassword.checked ? "text" : "password";
 });
 
-/* LOGIN */
+// Login
 loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault(); // stop page reload
-
+  e.preventDefault();
   const email = document.getElementById("email").value;
   const password = passwordInput.value;
 
@@ -35,46 +40,17 @@ loginForm.addEventListener("submit", async (e) => {
     }
 
     localStorage.setItem("adminToken", data.token);
-
     loginSection.style.display = "none";
     dashboardSection.style.display = "block";
-    loadMessages();
-
   } catch (err) {
-    loginError.textContent = "Server error. Try again.";
+    console.error(err);
+    loginError.textContent = "Cannot reach server";
   }
 });
 
-/* LOAD MESSAGES */
-async function loadMessages() {
-  const token = localStorage.getItem("adminToken");
-  if (!token) return;
-
-  const res = await fetch(`${API_BASE_URL}/api/contact`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-
-  const messages = await res.json();
-  const container = document.getElementById("messages");
-  container.innerHTML = "";
-
-  messages.forEach(msg => {
-    container.innerHTML += `
-      <div class="card">
-        <h4>${msg.name}</h4>
-        <p>${msg.email}</p>
-        <p>${msg.message}</p>
-        <hr/>
-      </div>
-    `;
-  });
-}
-
-/* AUTO LOGIN */
-if (localStorage.getItem("adminToken")) {
-  loginSection.style.display = "none";
-  dashboardSection.style.display = "block";
-  loadMessages();
+// Logout function
+function logout() {
+  localStorage.removeItem("adminToken");
+  dashboardSection.style.display = "none";
+  loginSection.style.display = "block";
 }

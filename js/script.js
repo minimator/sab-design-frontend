@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // =============================
 // CONTACT FORM SUBMISSION
 // =============================
-const contactForm = document.querySelector("form");
+const contactForm = document.querySelector("#contactForm");
 
 if (contactForm) {
   contactForm.addEventListener("submit", async (e) => {
