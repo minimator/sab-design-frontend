@@ -13,10 +13,10 @@
   <link rel="stylesheet" href="css/style.css">
 
   <style>
-    /* 🎨 MODERN ADMIN PAGE STYLES */
+    /*  MODERN ADMIN PAGE STYLES */
     
     :root {
-      --primary-color: #007bff; /* A clean blue */
+      --primary-color: #5c3d2e;
       --secondary-bg: #f5f7fa; /* Light background for sections */
       --border-color: #e0e0e0;
       --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
@@ -91,7 +91,7 @@
         transition: background-color 0.3s, transform 0.1s;
     }
     .btn-primary:hover {
-        background-color: #0056b3;
+        background-color: #5c3d2e;
     }
     .btn-primary:active {
         transform: scale(0.99);
@@ -223,7 +223,7 @@
 
 <section class="section section-white" id="dashboard-section" style="display:none;">
   <div class="container">
-    <h2 class="section-heading">📊 Admin Dashboard</h2>
+    <h2 class="section-heading">Admin Dashboard</h2>
 
     <div style="text-align: right; margin-bottom: 20px;">
         <button class="btn btn-secondary" id="logoutBtn">Logout</button>
@@ -231,9 +231,9 @@
 
     <h3>Statistics Overview</h3>
     <div class="stat-box-container">
-      <div class="stat-box">Messages Received 💬<strong id="msgCount">0</strong></div>
-      <div class="stat-box">Total Projects 🏗️<strong id="projectCount">0</strong></div>
-      <div class="stat-box">Active Admins 👤<strong id="adminCount">0</strong></div>
+      <div class="stat-box">Messages Received <strong id="msgCount">0</strong></div>
+      <div class="stat-box">Total Projects <strong id="projectCount">0</strong></div>
+      <div class="stat-box">Active Admins <strong id="adminCount">0</strong></div>
     </div>
 
     <hr style="margin:40px 0; border-color: #eee;" />
@@ -291,5 +291,23 @@
     });
   }
 </script>
+
+<script>
+  const togglePassword = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("password");
+
+  togglePassword.addEventListener("click", () => {
+    const type =
+      passwordInput.getAttribute("type") === "password"
+        ? "text"
+        : "password";
+
+    passwordInput.setAttribute("type", type);
+
+    togglePassword.classList.toggle("fa-eye");
+    togglePassword.classList.toggle("fa-eye-slash");
+  });
+</script>
+
 </body>
 </html>
