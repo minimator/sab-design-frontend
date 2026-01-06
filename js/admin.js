@@ -70,6 +70,21 @@ if (loginForm) {
     }
   });
 }
+// ========================
+// LOAD STATS
+// ========================
+
+async function loadStats() {
+  const res = await fetch(`${API_URL}/api/admin/stats`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+  });
+
+  const data = await res.json();
+  msgCount.textContent = data.messages;
+  projectCount.textContent = data.projects;
+  adminCount.textContent = data.admins;
+}
+
 
 // ========================
 // LOGOUT
@@ -108,41 +123,100 @@ async function loadAnalytics() {
 }
 
 // ========================
+// LOAD MESSAGES
+// ========================
+async function loadMessages() {
+  const res = await fetch(`${API_URL}/api/contact`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+
+  const messages = await res.json();
+  document.getElementById("messages").innerHTML = messages.map(m => `
+    <div>
+      <strong>${m.name}</strong> (${m.email})
+      <p>${m.message}</p>
+      <hr/>
+    </div>
+  `).join("");
+}
+
+
+// ========================
 // ADD PROJECT
 // ========================
 if (projectForm) {
   projectForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const title = document.getElementById("title").value;
-    const image = document.getElementById("image").value;
-    const description = document.getElementById("description").value;
+    const title = document.getElementById("title").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const imageFile = document.getElementById("imageFile").files[0];
+    const token = localStorage.getItem("token");
+
+    if (!imageFile) {
+      projectMsg.style.color = "red";
+      projectMsg.textContent = "Please select an image";
+      return;
+    }
 
     try {
-      const res = await fetch(`${API_URL}/api/projects`, {
+      /* ================= 1️⃣ UPLOAD IMAGE ================= */
+      const formData = new FormData();
+      formData.append("image", imageFile);
+
+      const uploadRes = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
-        headers: authHeader(),
-        body: JSON.stringify({ title, image, description })
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
       });
 
-      const data = await res.json();
+      const uploadData = await uploadRes.json();
 
-      if (!res.ok) {
+      if (!uploadRes.ok) {
+        projectMsg.textContent = "Image upload failed";
+        return;
+      }
+
+      /* ================= 2️⃣ SAVE PROJECT ================= */
+      const projectRes = await fetch(`${API_URL}/api/projects`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          image: uploadData.url
+        })
+      });
+
+      const data = await projectRes.json();
+
+      if (!projectRes.ok) {
         projectMsg.style.color = "red";
-        projectMsg.innerText = data.message || "Failed";
+        projectMsg.textContent = data.message || "Project save failed";
         return;
       }
 
       projectMsg.style.color = "green";
-      projectMsg.innerText = "Project added!";
+      projectMsg.textContent = "Project uploaded successfully ✅";
       projectForm.reset();
       loadProjects();
       loadAnalytics();
+
     } catch (err) {
-      projectMsg.innerText = "Server error";
+      console.error(err);
+      projectMsg.style.color = "red";
+      projectMsg.textContent = "Server error";
     }
   });
 }
+
 
 // ========================
 // LOAD PROJECTS
