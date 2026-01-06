@@ -203,7 +203,7 @@
 
 <section class="section section-white" data-aos="fade-up" id="login-section">
   <div class="container">
-    <h2 class="section-heading">🔑 Admin Login</h2> 
+    <h2 class="section-heading">🔑Admin Login</h2> 
     <p style="text-align:center; margin-bottom: 30px; color:#666;">Please login to access the dashboard securely.</p>
 
     <form id="loginForm" class="admin-form">
@@ -241,7 +241,7 @@
     <h3>➕ Add New Project</h3>
     <form id="projectForm" class="admin-form">
       <input class="admin-input" id="title" placeholder="Project Title" required />
-      <input class="admin-input" id="image" placeholder="Image URL (e.g., https://.../image.jpg)" required />
+      <input type="file" id="imageFile" accept="image/*" required />
       <textarea class="admin-input" id="description" placeholder="Brief Description of the Project" required></textarea>
 
       <button class="btn btn-primary" type="submit" style="width:100%;">Upload Project</button>
